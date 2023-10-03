@@ -30,10 +30,10 @@ class LaundryMachine(models.Model):
     )
     
     #time when machine was last started
-    last_start_time = models.DateTimeField(null=True)
+    last_start_time = models.DateTimeField(null=True, blank=True)
     
     #time when machine was last finished
-    last_end_time = models.DateTimeField(null=True)
+    last_end_time = models.DateTimeField(null=True, blank=True)
     
     #avg run time in seconds
     avg_run_time = models.IntegerField(default=0)
@@ -51,7 +51,7 @@ class LaundryMachine(models.Model):
     
     #return string representation of object
     def __str__(self):
-        return self.name
+        return self.name + " " + self.get_machine_type_display() + " - " + self.get_status_display() + " - " + str(self.last_power) + "w"
 
 
      
@@ -88,5 +88,13 @@ class KasaPowerReading(models.Model):
     #return string representation of object
     def __str__(self):
         return self.kasa.ip_address + " - " + str(self.timestamp) + " - " + str(self.power)
+    
+    #override save to update upstream power reading
+    def save(self, *args, **kwargs):
+        super(KasaPowerReading, self).save(*args, **kwargs)
+        self.kasa.power_integration.last_voltage = self.voltage
+        self.kasa.power_integration.last_current = self.current
+        self.kasa.power_integration.last_power = self.power
+        self.kasa.power_integration.save()
     
 #-------------------------------------------------------------
