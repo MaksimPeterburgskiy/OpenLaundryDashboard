@@ -68,7 +68,7 @@ class Kasa(models.Model):
     
     #return string representation of object
     def __str__(self):
-        return self.ip_address + " - " + self.power_integration.name
+        return self.ip_address + " - " + self.power_integration.name + " " + self.power_integration.get_machine_type_display()
     
 
 
