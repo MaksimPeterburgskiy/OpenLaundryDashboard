@@ -142,5 +142,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRONJOBS = [
-    ('* * * * *', 'old.tasks.pollKasaDevices')
+    ('* * * * *', 'old.tasks.pollKasaDevices'),
+     #remove Kasa Power Readings that are older than 30 days
+    ('0 0 * * *', 'old.tasks.cleanupKasaReadings'),
+    
 ]

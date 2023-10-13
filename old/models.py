@@ -1,4 +1,25 @@
+import asyncio
+import datetime
 from django.db import models
+import old.tasks
+
+
+
+
+#notification integrations
+
+class DiscordHook(models.Model):
+    webhook_name = models.CharField(max_length=200)
+    machines = models.ManyToManyField('LaundryMachine')
+    webhook_url = models.CharField(max_length=200)
+    discord_name = models.CharField(max_length=200)
+    ping_tag = models.CharField(max_length=200)
+    
+    
+    #name
+    def __str__(self):
+        return self.webhook_name
+
 
 
 
@@ -34,6 +55,8 @@ class LaundryMachine(models.Model):
     
     #time when machine was last finished
     last_end_time = models.DateTimeField(null=True, blank=True)
+    
+    last_status_change_time = models.DateTimeField(null=True, blank=True)
     
     #avg run time in seconds
     avg_run_time = models.IntegerField(default=0)
@@ -95,6 +118,27 @@ class KasaPowerReading(models.Model):
         self.kasa.power_integration.last_voltage = self.voltage
         self.kasa.power_integration.last_current = self.current
         self.kasa.power_integration.last_power = self.power
+        
+        change = False
+        #set status of machine based on current power reading and power threshold
+        #set to running if power is above threshold and machine is available
+        if(self.power > self.kasa.power_integration.on_power_threshold and self.kasa.power_integration.status != "R"):
+            if(self.kasa.power_integration.status == "A" or self.kasa.power_integration.status == "F"):
+                self.kasa.power_integration.last_start_time = self.timestamp
+            self.kasa.power_integration.status = "R"
+            self.kasa.power_integration.last_status_change_time = self.timestamp
+            change = True
+            
+        #set to available if power is below threshold and set end time
+        elif(self.power < self.kasa.power_integration.on_power_threshold and self.kasa.power_integration.status == "R"):
+            self.kasa.power_integration.status = "F"
+            self.kasa.power_integration.last_end_time = self.timestamp
+            self.kasa.power_integration.last_status_change_time = self.timestamp
+            change = True
+
+        #save upstream machine status
         self.kasa.power_integration.save()
+        if(change):
+            asyncio.run(old.tasks.sendDiscordNotification(self.kasa.power_integration))
     
 #-------------------------------------------------------------
