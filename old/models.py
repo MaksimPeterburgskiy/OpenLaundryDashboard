@@ -6,6 +6,7 @@ import old.tasks
 
 
 
+
 #notification integrations
 
 class DiscordHook(models.Model):
@@ -14,6 +15,8 @@ class DiscordHook(models.Model):
     webhook_url = models.CharField(max_length=200)
     discord_name = models.CharField(max_length=200)
     ping_tag = models.CharField(max_length=200)
+    message_id = models.CharField(max_length=200, blank=True)
+    avatar_url = models.CharField(max_length=200, blank=True)
     
     
     #name
