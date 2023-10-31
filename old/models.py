@@ -142,6 +142,7 @@ class KasaPowerReading(models.Model):
         #save upstream machine status
         self.kasa.power_integration.save()
         if(change):
-            asyncio.run(old.tasks.sendDiscordNotification(self.kasa.power_integration))
+            old.tasks.sendDiscordNotification(self.kasa.power_integration)
+            
     
 #-------------------------------------------------------------
