@@ -2,6 +2,7 @@ import asyncio
 import datetime
 from django.db import models
 import old.tasks
+import pytz
 
 
 
@@ -79,9 +80,12 @@ class LaundryMachine(models.Model):
     def __str__(self):
         return self.name + " " + self.get_machine_type_display() + " - " + self.get_status_display() + " - " + str(self.last_power) + "w"
 
-
-     
-     
+    def machine_type_string(self):
+        return self.get_machine_type_display()
+    def machine_status_string(self):
+        return self.get_status_display()
+    def machine_last_status_change_time_string(self): #format Tue Oct 31 4:43pm in new york time (not -4)
+        return self.last_status_change_time.astimezone(pytz.timezone("America/New_York")).strftime("%a %b %d %I:%M%p")
 #Kasa Module Specific 
 #-------------------------------------------------------------
 class Kasa(models.Model):

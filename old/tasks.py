@@ -37,7 +37,7 @@ def sendDiscordNotification(machine):
         # create a webhook
         webhook = SyncWebhook.from_url(hook.webhook_url)
         # compose message content
-        content = hook.ping_tag + " " + machine.name + " " + machine.get_machine_type_display() + " is now " + machine.get_status_display() + "! ("+ str(datetime.now(pytz.timezone("America/New_York")).strftime('%a %b %d %H:%M:%S %Z'))+ ")"
+        content = hook.ping_tag + " " + machine.name + " " + machine.get_machine_type_display() + " is now " + machine.get_status_display() + "! ("+ str(datetime.now(pytz.timezone("America/New_York")).strftime("%a %b %d %I:%M%p"))+ ")"
         # if the hook doesn't have a message id, send a new message
         if not hook.message_id:
             message = webhook.send(content, username='LaundryBot', avatar_url=hook.avatar_url, wait=True)

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,12 +30,13 @@
     </div>
     <!--Machine Cards-->
     <div class="row justify-content-center pt-3">
+    {%for machine in LaundryMachines%}
         <div class = "col-auto pb-2">
             <div class="card" style="width: 15rem; outline: dashed red;" >
                 <img src="/static/images/washer.gif" class="card-img-top py-1 px-2" alt="...">
                 <div class="card-body py-1">
-                  <h5 class="card-title">Large 0 Washer</h5>
-                    <p class="card-text">Running since: <br> Tue Oct 31 16:43:13 EDT</p>
+                  <h5 class="card-title">{{machine.name}} {{ machine.machine_type_string}}</h5>
+                    <p class="card-text">{{machine.get_status_display}} since: <br> {{machine.machine_last_status_change_time_string}}</p>
                     
                 </div>
                 <ul class="list-group list-group-flush">
@@ -42,6 +44,7 @@
                 </ul>
               </div>
         </div>
+    {%endfor%}
 
     </div>
 
