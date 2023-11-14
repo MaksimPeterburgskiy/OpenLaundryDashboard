@@ -64,13 +64,14 @@ class LaundryMachine(models.Model):
     
     #avg run time in seconds
     avg_run_time = models.IntegerField(default=0)
+    eta_minutes = models.IntegerField(default=0)
     
     #last voltage reading
-    last_voltage = models.DecimalField(max_digits=10, decimal_places=3, null=True)
+    last_voltage = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
     #last current reading
-    last_current = models.DecimalField(max_digits=10, decimal_places=3, null=True)
+    last_current = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
     #last power reading
-    last_power = models.DecimalField(max_digits=10, decimal_places=3, null=True)
+    last_power = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
     
     
     #calibration settings
@@ -84,8 +85,9 @@ class LaundryMachine(models.Model):
         return self.get_machine_type_display()
     def machine_status_string(self):
         return self.get_status_display()
-    def machine_last_status_change_time_string(self): #format Tue Oct 31 4:43pm in new york time (not -4)
-        return self.last_status_change_time.astimezone(pytz.timezone("America/New_York")).strftime("%a %b %d %I:%M%p")
+    def machine_last_status_change_time_string(self):
+    # format Tue Oct 31 4:43pm in new york time (not -4)
+        return self.last_status_change_time.astimezone(pytz.timezone("America/New_York")).strftime("%a %b %-d %-I:%M %p") 
 #Kasa Module Specific 
 #-------------------------------------------------------------
 class Kasa(models.Model):
@@ -126,6 +128,13 @@ class KasaPowerReading(models.Model):
         self.kasa.power_integration.last_current = self.current
         self.kasa.power_integration.last_power = self.power
         
+        #update eta based on avg runtime and current time
+        if(self.kasa.power_integration.last_start_time is not None and self.kasa.power_integration.avg_run_time != 0):
+            delta = self.kasa.power_integration.last_start_time + datetime.timedelta(minutes=self.kasa.power_integration.avg_run_time) - self.timestamp
+            if delta.total_seconds() > 0:
+                self.kasa.power_integration.eta_minutes = delta.seconds // 60 # convert seconds to minutes
+            else:
+                self.kasa.power_integration.eta_minutes = 0 # or some error handling
         change = False
         #set status of machine based on current power reading and power threshold
         #set to running if power is above threshold and machine is available
