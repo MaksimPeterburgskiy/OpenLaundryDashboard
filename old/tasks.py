@@ -40,7 +40,7 @@ def sendDiscordNotification(machine):
         content = hook.ping_tag + " " + machine.name + " " + machine.get_machine_type_display() + " is now " + machine.get_status_display() + "! ("+ str(datetime.now(pytz.timezone("America/New_York")).strftime("%a %b %d %I:%M%p"))+ ")"
         # if the hook doesn't have a message id, send a new message
         if not hook.message_id:
-            message = webhook.send(content, username='LaundryBot', avatar_url=hook.avatar_url, wait=True)
+            message = webhook.send(content, username=hook.discord_name, avatar_url=hook.avatar_url, wait=True)
             # get message id from received message and save it to the hook model
             hook.message_id = message.id
             hook.save()
@@ -52,7 +52,7 @@ def sendDiscordNotification(machine):
                 webhook.delete_message(hook.message_id)
             except:
                 pass
-            message = webhook.send(content, username='LaundryBot', avatar_url=hook.avatar_url, wait=True)
+            message = webhook.send(content, username=hook.discord_name, avatar_url=hook.avatar_url, wait=True)
             # get message id
             hook.message_id = message.id
             hook.save()
