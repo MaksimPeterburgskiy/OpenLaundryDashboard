@@ -45,7 +45,7 @@
         <div class="row justify-content-center pt-3" style="width:100vw;">
             {% for machine in LaundryMachines %}
                 <div class = "col-auto pb-2">
-                    <div id = "{{ machine.pk }}" class="card shadow" style="width: 15rem;">
+                    <div id = "{{ machine.pk }}" class="card shadow mb-2" style="width: 15rem;">
                         {% if machine.status == "R" %}
                             <img src="/static/images/washer.gif"
                                  class="card-img-top py-1 px-2"
@@ -63,16 +63,28 @@
                                  style="outline: dashed green">
                         {% endif %}
                         <div class="card-body py-1">
-                            <h5 class="card-title">
-                                {{ machine.name }} {{ machine.machine_type_string }}
-                                <br>
-                                {{ machine.last_power|floatformat:0 }}w
-                            </h5>
+                            
+                                <h5 class="card-title">
+                                    {{ machine.name }} {{ machine.machine_type_string }}
+                                    <br>
+                                    {{ machine.last_power|floatformat:0 }}w
+                                </h5>
+                                
                             <p class="card-text">
                                 {{ machine.get_status_display }} since:
                                 <br>
                                 {{ machine.machine_last_status_change_time_string }}
                             </p>
+                            {% if machine.status == "F" %}
+                                <div class="card-text pb-3">
+                                    <button type="button" onclick="location.href='{% url "set_available" machine.pk %}'" class="btn btn-success btn-sm w-100">Mark Available</button>
+                                </div>
+                            {% else %}
+                                <div class="card-text pb-3 d-none">
+                                    <button type="button" onclick="location.href='{% url "set_available" machine.pk %}'" class="btn btn-success btn-sm w-100">Mark Available</button>
+                                </div>
+                            {% endif %}
+
                         </div>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">ETA: {{ machine.eta_minutes }} Minutes</li>
@@ -176,15 +188,22 @@
                             machine.getElementsByTagName('img')[0].style.outline = "dotted blue";
                             //change image src 
                             machine.getElementsByTagName('img')[0].src = "/static/images/washer.gif";
+                            //hide button
+                            machine.getElementsByTagName('div')[0].getElementsByTagName('div')[0].classList.add("d-none");
                             
                         } 
                         else if (val.fields.status == "F") {
                             machine.getElementsByTagName('img')[0].style.outline = "dotted yellow";
                             machine.getElementsByTagName('img')[0].src = "/static/images/washer.png";
+                            
+                            //show hidden button
+                            machine.getElementsByTagName('div')[0].getElementsByTagName('div')[0].classList.remove("d-none");
                         } 
                         else {
                             machine.getElementsByTagName('img')[0].style.outline = "dotted green";
                             machine.getElementsByTagName('img')[0].src = "/static/images/washer.png";
+                            //hide button
+                            machine.getElementsByTagName('div')[0].getElementsByTagName('div')[0].classList.add("d-none");
                         }
 
                         //get full type
