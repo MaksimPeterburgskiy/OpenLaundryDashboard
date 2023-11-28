@@ -154,3 +154,5 @@ CRONJOBS = [
 ]
 #dotted python path to the settings module to run the command with (prod_settings.py)
 CRONTAB_DJANGO_SETTINGS_MODULE = 'OpenLaundryDashboard.prod_settings'
+
+CRONTAB_COMMAND_PREFIX='LOGIN='+str(os.environ.get('LOGIN'))+ ' SECRET_KEY=' + str(os.environ.get('SECRET_KEY'))
