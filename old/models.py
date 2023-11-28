@@ -81,6 +81,12 @@ class LaundryMachine(models.Model):
     def __str__(self):
         return self.name + " " + self.get_machine_type_display() + " - " + self.get_status_display() + " - " + str(self.last_power) + "w"
 
+    def save(self, *args, **kwargs):
+        super(LaundryMachine, self).save(*args, **kwargs)
+        #if machine status set to available, send a Notification
+        if(self.status == "A"):
+            old.tasks.sendDiscordNotification(self)
+
     def machine_type_string(self):
         return self.get_machine_type_display()
     def machine_status_string(self):
