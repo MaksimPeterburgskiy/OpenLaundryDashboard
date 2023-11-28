@@ -45,7 +45,7 @@
         <div class="row justify-content-center pt-3" style="width:100vw;">
             {% for machine in LaundryMachines %}
                 <div class = "col-auto pb-2">
-                    <div id = "{{ machine.pk }}" class="card shadow" style="width: 15rem;">
+                    <div id = "{{ machine.pk }}" class="card shadow mb-2" style="width: 15rem;">
                         {% if machine.status == "R" %}
                             <img src="/static/images/washer.gif"
                                  class="card-img-top py-1 px-2"
