@@ -151,5 +151,6 @@ CRONJOBS = [
     ('* * * * *', 'old.tasks.pollKasaDevices'),
      #remove Kasa Power Readings that are older than 30 days
     ('0 0 * * *', 'old.tasks.cleanupKasaReadings'),
-    
 ]
+#dotted python path to the settings module to run the command with (prod_settings.py)
+CRONTAB_DJANGO_SETTINGS_MODULE = 'OpenLaundryDashboard.prod_settings'
