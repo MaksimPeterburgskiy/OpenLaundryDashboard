@@ -82,11 +82,28 @@ class LaundryMachine(models.Model):
         return self.name + " " + self.get_machine_type_display() + " - " + self.get_status_display() + " - " + str(self.last_power) + "w"
 
     def save(self, *args, **kwargs):
-        super(LaundryMachine, self).save(*args, **kwargs)
-        #if machine status set to available, send a Notification
-        if(self.status == "A"):
-            old.tasks.sendDiscordNotification(self)
+        # if the machine status changes to available after save, send notification
+        # The check for PK guarantees that we are dealing with an 'update' operation instead of 'create'
+        notify = False
+        if self.pk is not None:
+            old1 = LaundryMachine.objects.get(pk=self.pk)
+            
+            # If status was not 'A' before but is 'A' now, send the notification
+            if old1.status != self.status and self.status == "A":
+                notify = True
 
+        # Save the instance first regardless of whether notification needs to be sent.
+        super().save(*args, **kwargs)
+        
+        # Send the notification after ensuring that the data is saved.
+        if notify:
+            # Assuming sendDiscordNotification() belongs to LaundryMachine instance
+            old.tasks.sendDiscordNotification(self)
+        
+        
+        
+        
+        
     def machine_type_string(self):
         return self.get_machine_type_display()
     def machine_status_string(self):
