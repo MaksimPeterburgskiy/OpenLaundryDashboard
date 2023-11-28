@@ -174,12 +174,17 @@
                         if (val.fields.status == "R") {
                             //set inner image outline to blue
                             machine.getElementsByTagName('img')[0].style.outline = "dotted blue";
+                            //change image src 
+                            machine.getElementsByTagName('img')[0].src = "/static/images/washer.gif";
+                            
                         } 
                         else if (val.fields.status == "F") {
                             machine.getElementsByTagName('img')[0].style.outline = "dotted yellow";
+                            machine.getElementsByTagName('img')[0].src = "/static/images/washer.png";
                         } 
                         else {
                             machine.getElementsByTagName('img')[0].style.outline = "dotted green";
+                            machine.getElementsByTagName('img')[0].src = "/static/images/washer.png";
                         }
 
                         //get full type

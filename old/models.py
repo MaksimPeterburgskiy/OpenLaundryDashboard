@@ -136,6 +136,7 @@ class KasaPowerReading(models.Model):
             else:
                 self.kasa.power_integration.eta_minutes = 0 # or some error handling
         change = False
+        
         #set status of machine based on current power reading and power threshold
         #set to running if power is above threshold and machine is available
         if(self.power > self.kasa.power_integration.on_power_threshold and self.kasa.power_integration.status != "R"):
