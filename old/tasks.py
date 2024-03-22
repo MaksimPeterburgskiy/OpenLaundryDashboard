@@ -13,13 +13,18 @@ import pytz
 def pollKasaDevices():
     
     for switch in old.models.Kasa.objects.all():
-            p = SmartPlug(switch.ip_address)
-            asyncio.run(p.update())  # Request the update
-            old.models.KasaPowerReading.objects.create(kasa=switch, 
-                                            current=p.emeter_realtime['current'], 
-                                            voltage=p.emeter_realtime['voltage'], 
-                                            power=p.emeter_realtime['power'])
-            print("Kasa: " + switch.ip_address + " - " + str(p.emeter_realtime['power']))
+            try:
+                p = SmartPlug(switch.ip_address)
+                asyncio.run(p.update())  # Request the update
+                old.models.KasaPowerReading.objects.create(kasa=switch, 
+                                                current=p.emeter_realtime['current'], 
+                                                voltage=p.emeter_realtime['voltage'], 
+                                                power=p.emeter_realtime['power'])
+                print("Kasa: " + switch.ip_address + " - " + str(p.emeter_realtime['power']))
+            
+            except Exception as e:
+                print("Kasa: " + switch.ip_address + " - Error Reading Power " + str(e))
+            
             
 
 #remove Kasa Power Readings that are older than 30 days
