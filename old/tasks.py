@@ -1,9 +1,8 @@
-
+from kasa import SmartPlug
+from discord import SyncWebhook
 from datetime import datetime, timedelta
 import old.models
 import asyncio
-from kasa import SmartPlug
-from discord import SyncWebhook
 import aiohttp
 from asgiref.sync import sync_to_async, async_to_sync
 import random
@@ -33,7 +32,6 @@ def cleanupKasaReadings():
     print(old.models.KasaPowerReading.objects.filter(timestamp__lte=datetime.now() - timedelta(days=30)).delete())
     
     print("Kasa Power Readings Cleaned Up")
-
 
 def sendDiscordNotification(machine):   
     # get hook used for machine (Many to Many)

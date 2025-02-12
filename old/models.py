@@ -4,9 +4,7 @@ from django.db import models
 import old.tasks
 import pytz
 
-
-
-
+CONFIRM_READINGS_COUNT = 3  # configurable number of readings for confirmation
 
 #notification integrations
 
@@ -110,7 +108,11 @@ class LaundryMachine(models.Model):
         return self.get_status_display()
     def machine_last_status_change_time_string(self):
     # format Tue Oct 31 4:43pm in new york time (not -4)
-        return self.last_status_change_time.astimezone(pytz.timezone("America/New_York")).strftime("%a %b %-d %-I:%M %p") 
+        return self.last_status_change_time.astimezone(pytz.timezone("America/New_York")).strftime("%a %b %-d %-I:%M %p")
+    
+    
+    
+     
 #Kasa Module Specific 
 #-------------------------------------------------------------
 class Kasa(models.Model):
@@ -171,10 +173,12 @@ class KasaPowerReading(models.Model):
             
         #set to available if power is below threshold and set end time
         elif(self.power < self.kasa.power_integration.on_power_threshold and self.kasa.power_integration.status == "R"):
-            self.kasa.power_integration.status = "F"
-            self.kasa.power_integration.last_end_time = self.timestamp
-            self.kasa.power_integration.last_status_change_time = self.timestamp
-            change = True
+            recent_readings = KasaPowerReading.objects.filter(kasa=self.kasa).order_by('-timestamp')[:CONFIRM_READINGS_COUNT]
+            if all(reading.power < self.kasa.power_integration.on_power_threshold for reading in recent_readings):
+                self.kasa.power_integration.status = "F"
+                self.kasa.power_integration.last_end_time = self.timestamp
+                self.kasa.power_integration.last_status_change_time = self.timestamp
+                change = True
 
         #save upstream machine status
         self.kasa.power_integration.save()
